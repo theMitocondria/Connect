@@ -129,13 +129,12 @@ exports.getPostOfFollowing=async(req,res)=>{
                 // $in:user.following kya krega $in mtlb mongo db ka ek function to find all the matching items from a given array
                 $in: user.following
             }
-        });
+        }).populate("owner likes comments.user");
 
         // now we will return the posts of followed user to logged in user
         res.status(200).json({
             success:true,
-            posts
-
+            posts:posts.reverse()
         })
     } catch (error) {
         res.status(500).json({
@@ -170,6 +169,36 @@ exports.updateCaption=async(req,res)=>{
         return res.status(200).json({
             message:"DOne caption",
             success:true
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:error.message,
+            success:false
+        })
+    }
+}
+
+
+exports.addComment=async(req,res)=>{
+    try {
+        const post=await Post.findById(req.params.id);
+        //console.log(post);
+        if(!post){
+            return res.status(404).json({
+                message:"No post",
+                success:false,
+            })
+        }
+
+        post.comments.push({
+            comment:req.body.comment,
+            user:req.user._id
+        })
+        
+        await post.save();
+        return res.status(200).json({
+            message:"successful comment",
+            comments:post.comments
         })
     } catch (error) {
         res.status(500).json({

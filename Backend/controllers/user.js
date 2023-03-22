@@ -1,5 +1,6 @@
 const User=require("../models/user");
-const Post = require("../models/post")
+const Post = require("../models/post");
+const {sendEmail}=require("../middlewares/sendMail");
 exports.register=async(req,res)=>{
 
     try {
@@ -319,6 +320,88 @@ exports.getAllUsers=async (req,res)=>{
             message:"happy",
             success:true,
             user
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:error.message,
+            success:false
+        })  
+    }
+}
+
+exports.ForgottenPassword=async(req,res)=>{
+    try {
+
+        const user=await User.findOne({email:req.body.email});
+        if(!user){
+            return res.status(404).json({
+                message:"No user found",
+                success:false,
+            })
+        }
+
+        const resetPassword= user.getResetPassword();
+
+        await user.save();
+
+        const resetUrl=`${req.protocol}://${req.get("host")}/api/v1/password/reset/${resetPassword}`;
+        const message1=`Reset your password by clicking on the link below${resetUrl}`;
+
+        try {
+            await sendEmail({
+                email:user.email,
+                subject:"Reset Password",
+                message1,
+            })
+
+            return res.status(200).json({
+                success:true,
+                message:"mail send sucessfullu"
+            })
+        } catch (error) {
+            user.resetPasswordExpire=undefined;
+            user.resetPasswordToken=undefined;
+
+            await user.save();
+
+            return res.status(500).json({
+                message:error.message,
+                success:false
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            message:error.message,
+            success:false
+        })  
+    }
+}
+
+exports.ResetPassword=async(req,res)=>{
+    try {
+        const resetPasswordToken=req.params.token;
+
+        const user=await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire:{$gt:Date.now()}
+        })
+        
+        if(!user){
+        
+            return res.status(400).json({
+                message:"Expired token or invalid ",
+                success:false,
+            })
+        } 
+        user.password=req.body.password;
+        user.resetPasswordToken=undefined;
+        user.resetPasswordExpire=undefined;
+
+        await user.save();
+
+        return res.status(200).json({
+            message:"Password Updated",
+            success:true,
         })
     } catch (error) {
         res.status(500).json({
