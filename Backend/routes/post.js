@@ -7,5 +7,5 @@ const router=express.Router();
 router.route("/post/upload").post(isAuthenticated,createPost);
 router.route("/post/:id").get(isAuthenticated,LikeAndDislike).put(isAuthenticated,updateCaption).delete(isAuthenticated,DeletePost);
 router.route("/post").get(isAuthenticated,getPostOfFollowing);
-router.route("/post/comment/:id").get(isAuthenticated,addComment);
+router.route("/post/comment/:id").put(isAuthenticated,addComment);
 module.exports=router;

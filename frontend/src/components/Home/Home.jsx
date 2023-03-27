@@ -6,6 +6,8 @@ import { Typography } from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import { GetAllUser, getFollowingPosts } from '../../Actions/user';
 import Loader from '../Loader/Loader';
+import { useAlert } from 'react-alert';
+
 
 const Home = () => {
   const dispatch=useDispatch();
@@ -14,6 +16,10 @@ const Home = () => {
     (state)=>state.PostOfFollowing
   )
 
+  const alert=useAlert();
+  const {message,error:LikeError}=useSelector((state)=>state.like);
+
+
   const posts1=useSelector((state)=>state.GetAllUser.posts);
 
   console.log(posts1);
@@ -21,6 +27,22 @@ const Home = () => {
     dispatch(getFollowingPosts());
     dispatch(GetAllUser());
   },[dispatch])
+
+  
+  useEffect(()=>{
+    if(error){
+      alert.error(error);
+      dispatch({type:"clearErrors"})
+    }
+    if(LikeError){
+      alert.error(LikeError);
+      dispatch({type:"clearErrors"})
+    }
+    if(message){
+      alert.success(message);
+      dispatch({type:"clearMessage"})
+    }
+  },[error,LikeError,message,alert,dispatch]);
 
   return (
       loading?<Loader />:(

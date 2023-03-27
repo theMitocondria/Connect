@@ -1,14 +1,21 @@
 const Post=require("../models/post");
 const user = require("../models/user");
 const User=require("../models/user");
+const cloudinary=require("cloudinary");
 
 exports.createPost=async(req,res)=>{
-    try {
+    try {  
+
+        const MyCLoud = await cloudinary.v2.uploader.upload(req.body.image,{
+            folder:"posts"
+        });
+
+
         const newPostData={
             caption:req.body.caption,
             image:{
-                public_id:"req.body.public_id",
-                url:"req.body.url"
+                public_id:MyCLoud.public_id,
+                url:MyCLoud.secure_url,
             },
             owner:req.user._id,
         }
@@ -16,7 +23,7 @@ exports.createPost=async(req,res)=>{
         const newPost=await Post.create(newPostData);
         const user=await User.findById(req.user._id);
 
-        user.posts.push(newPost._id);
+        user.posts.unshift(newPost._id);
 
         await user.save();
         res.status(200).json({
@@ -50,9 +57,12 @@ exports.DeletePost=async(req,res)=>{
                 success:false,
             })
         }
-     
+        
+        await cloudinary.v2.uploader.destroy(post.image.public_id);
         // deletinf the post now as we know the user loginned is deleting post itself made by him
         await post.deleteOne();
+
+       
         
         // deleteing the id of post from the users post array
         const user=await User.findById(req.user._id);
@@ -198,7 +208,7 @@ exports.addComment=async(req,res)=>{
         await post.save();
         return res.status(200).json({
             message:"successful comment",
-            comments:post.comments
+            success:true
         })
     } catch (error) {
         res.status(500).json({

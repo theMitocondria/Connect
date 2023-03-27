@@ -1,0 +1,31 @@
+.CommentUser{
+    display: flex;
+    align-items: center;
+    color:rgba(0,0,0,0.543);
+}
+
+.CommentUser>a{
+    display: flex;
+    text-decoration: none;
+    color: black;
+    align-items: center;
+    align-self: flex-start;
+    transition: all 0.5s;
+}
+
+.CommentUser img{
+    height: 3vmax;
+    width: 3vmax;
+    margin: 1vmax;
+    border-radius: 100%;
+    border: 3px solid rgb(255,201,201);
+}
+
+.CommentUser>button{
+    color: red;
+}
+
+.CommentUser>a:hover{
+    transform: translateY(-10px);
+}
+

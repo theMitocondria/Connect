@@ -47,7 +47,25 @@ export const userReducer=createReducer(initialstate,{
     },
     clearErrrors:(state)=>{
         state.error=null
-    }
+    },
+
+    LogoutRequest:(state)=>{
+        state.loading=true;
+    },
+    LogoutSuccess:(state)=>{
+        state.loading=false;
+        state.user=null;
+        state.isAuthenticated=false;
+    },
+    LogoutFailure:(state,action)=>{
+        state.loading=false;
+        state.error=action.payload;
+        state.isAuthenticated=true;
+    },
+    clearErrrors:(state)=>{
+        state.error=null
+    },
+   
 });
 
 export const PostOfFollowingReducer=createReducer(initialstate,{
@@ -80,6 +98,24 @@ export const GetAllUserReducer=createReducer(initialstate,{
         state.error=action.payload;
     },
     clearErrrors:(state)=>{
+        state.error=null
+    }
+})
+
+
+export const UserProfileReducer=createReducer(initialstate,{
+    UserProfileRequest:(state)=>{
+        state.loading=true;
+    },
+    UserProfileSuccess:(state,action)=>{
+        state.loading=false;
+        state.posts=action.payload;
+    },
+    UserProfileFailure:(state,action)=>{
+        state.loading=false;
+        state.error=action.payload;
+    },
+    UserProfile:(state)=>{
         state.error=null
     }
 })

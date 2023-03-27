@@ -3,8 +3,8 @@ const cookie=require("cookie-parser");
 const app=express();
 
 //using middle ware
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.json({limit:"50mb"}));
+app.use(express.urlencoded({limit:"50mb",extended:true}));
 app.use(cookie());
 
 //to load only if we have not deployed yet iiliye not equal to production

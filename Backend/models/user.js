@@ -72,7 +72,7 @@ UserSchema.methods.generateToken=async function(){
 }
 
 
-UserSchema.methods.getResetPassword=async function(){
+UserSchema.methods.getResetPassword=function(){
     const resetToken=crypto.randomBytes(20).toString("hex");
 
     console.log(resetToken);
